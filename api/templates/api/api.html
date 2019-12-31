@@ -1,0 +1,250 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Página{% endblock %}
+{% block content %}
+<section class="page-section about-heading">
+  <div class="container">
+    <!--<img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="{% static 'core/img/contact.jpg' %}" alt="">-->
+    <div class="about-heading-content">
+      <div class="row">
+        <div class="col-xl-9 col-lg-10 mx-auto">
+          <div class="bg-faded rounded p-5">
+            <h2 class="section-heading mb-4">
+              <span class="section-heading-upper">News Article</span>
+              <span class="section-heading-lower">for Analysis </span>
+            </h2>
+            <!-- Formulario de contacto -->
+            {% if 'fail' in request.GET %}
+                <p><b>The address is not from the news page or is not correct.</b></p>
+            {% endif %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>URL *</label>
+                    <div class="input-group">
+                        {{form.url}}
+                    </div>
+                    <label class="text-muted">* (only) document in english</label>
+                    {{form.url.errors}}
+                </div>
+                <div class="text-center">
+                    <input type="submit" class="btn btn-primary btn-block py-2" value="Submit">
+                </div>
+            </form>
+            <!-- Fin formulario de contacto -->
+
+            <!-- Analysis -->
+            
+            <div class="container-fluid mt=5">
+              <div class="row">
+                <div class="col-xl-12 mx-auto">
+                  <div class="accordion" id="accordionAnalysis">
+                    <!--Sentiment Analysis-->
+                    {% if sentiment %}
+                    <div class="card">
+                      <div class="card-header" id="headingOne">
+                        <h2 class="mb-0">
+                          <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <h2 class="section-heading mb-4"><span class="section-heading-upper">Sentiment Analysis</span></h2>
+                          </button>
+                        </h2>
+                      </div>
+                      <div id="collapseOne" class="collapse " aria-labelledby="headingOne" data-parent="#accordionOne">
+                        <div class="card">
+                          <div class="card-body">
+                            <h4 class="card-title">Results</h4>
+                          </div>  
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item text-muted" > Polarity : <span>{{sentiment.polarity}}  </span></li>
+                              <li class="list-group-item text-muted" >Confidence: <span> {{ sentiment.polarity_confidence }}  </span></li>
+                            </ul>
+                            <div class="card-body">  
+                              <h4 class="card-title">Submitted Text</h4>
+                              <p class="card-text"> {{ sentiment.text }} </p>
+                            </div>
+
+                        </div>
+                      </div>  
+                    </div>  <!-- <div class="card"> One --> 
+                    {% endif %}
+
+                    <!--Classifiction Analysis-->
+                    {% if classifications %}
+                    <div class="card">
+                      <div class="card-header" id="headingTwo">
+                        <h2 class="mb-0">
+                          <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                            <h2 class="section-heading mb-4"><span class="section-heading-upper">Classification Analysis</span></h2>
+                          </button>
+                        </h2>
+                      </div>
+                      <div id="collapseTwo" class="collapse " aria-labelledby="headingTwo" data-parent="#accordionTwo">
+                        <div class="card">
+                          <div class="card-body">
+                            <h4 class="card-title">Results</h4>
+                          </div>  
+                          <ul class="list-group list-group-flush">
+                            <li class="list-group-item text-muted" > 
+                              <table class="table table-striped">
+                                <thead>
+                                  <tr>
+                                    <th>Code</th>
+                                    <th>Label</th>
+                                    <th>Confident</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for value in classifications.categories %}
+                                  <tr>
+                                    <td>{{value.code}}</td>
+                                    <td>{{value.label}}</td>
+                                    <td>{{value.confidence}}</td>
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>                                  
+                              </table>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>  
+                    </div>  <!-- <div class="card"> Two --> 
+                    {% endif %}
+
+                    <!--Entity Analysis-->
+                    {% if entities %}
+                    <div class="card">
+                      <div class="card-header" id="headingThree">
+                        <h2 class="mb-0">
+                          <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            <h2 class="section-heading mb-4"><span class="section-heading-upper">Entity Analysis</span></h2>
+                          </button>
+                        </h2>
+                      </div>
+                      <div id="collapseThree" class="collapse " aria-labelledby="headingThree" data-parent="#accordionThree">
+                        <div class="card">
+                          <div class="card-body">
+                            <h4 class="card-title">Results</h4>
+                          </div>  
+                          <ul class="list-group list-group-flush">
+                            <li class="list-group-item text-muted" > 
+                              <table class="table table-striped">
+                                <thead>
+                                  <tr>
+                                    <th>Type</th>
+                                    <th>Entity</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for entity in entities %}
+                                  <tr>
+                                    <td>{{entity.type}}</td>
+                                    <td>{{entity.entity}}</td>
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>                                  
+                              </table>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>  <!-- <div id="collapseTwo" class="collapse " aria-labelledby="headingOne" data-parent="#accordionTwo"> -->
+                    </div>  <!-- <div class="card"> Three --> 
+                    {% endif %}
+
+                    <!--Concept Analysis-->  
+                    {% if concepts %}
+                    <div class="card">
+                      <div class="card-header" id="headingFour">
+                        <h2 class="mb-0">
+                          <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                            <h2 class="section-heading mb-4"><span class="section-heading-upper">Concept Analysis</span></h2>
+                          </button>
+                        </h2>
+                      </div>
+                      <div id="collapseFour" class="collapse " aria-labelledby="headingFour" data-parent="#accordionFour">
+                        <div class="card">
+                          <div class="card-body">
+                            <h4 class="card-title">Results</h4>
+                          </div>  
+                          <ul class="list-group list-group-flush">
+                            <li class="list-group-item text-muted" > 
+                              <table class="table table-striped">
+                                <thead>
+                                  <tr>
+                                    <th>Concepts</th>
+                                    <th>Words</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for concept  in concepts %}
+                                  <tr>
+                                    <td>{{concept.uri}}</td>
+                                    <td>{{concept.words}}</td>
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>                                  
+                              </table>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>  <!-- <div id="collapseFour" class="collapse " aria-labelledby="headingFour" data-parent="#accordionFour"> -->
+                    </div>  <!-- <div class="card"> Four --> 
+                    {% endif %}
+
+                    <!--Summarization Analysis-->  
+                    {% if summary %}
+                    <div class="card">
+                      <div class="card-header" id="headingFive">
+                        <h2 class="mb-0">
+                          <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                            <h2 class="section-heading mb-4"><span class="section-heading-upper">Summarization Analysis</span></h2>
+                          </button>
+                        </h2>
+                      </div>
+                      <div id="collapseFive" class="collapse " aria-labelledby="headingFive" data-parent="#accordionFive">
+                        <div class="card">
+                          <div class="card-body">
+                            <h4 class="card-title">Results</h4>
+                          </div>  
+                          <ul class="list-group list-group-flush">
+                            <li class="list-group-item text-muted" > 
+                              <table class="table table-striped">
+                                <thead>
+                                  <tr>
+                                    <th>#</th>
+                                    <th>Sentence</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for sentence in summary.sentences %}
+                                  <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{sentence}}</td>
+                                  </tr>
+                                  {% endfor%}
+                                </tbody>                                  
+                              </table>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>  <!-- <div id="collapseFour" class="collapse " aria-labelledby="headingFour" data-parent="#accordionFour"> -->
+                    </div>  <!-- <div class="card"> Five --> 
+                    {% endif %}
+
+                  </div> <!-- <div class="accordion" id="accordionAnalysis"> -->
+                </div> <!-- <div class="col-xl-12 mx-auto"> -->
+              </div>  <!-- <div class="row">-->
+            </div>   <!-- <div class="container-fluid mt=5">-->
+            
+
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{% endblock %}
